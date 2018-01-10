@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Motion_Profile_Generator:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/Motion_Profile_Generator_jar</output-path>
-    <root id="archive" name="Motion_Profile_Generator.jar">
-      <element id="extracted-dir" path="$PROJECT_DIR$/../Pathfinder-Java.jar" path-in-jar="/" />
-    </root>
-  </artifact>
-</component>

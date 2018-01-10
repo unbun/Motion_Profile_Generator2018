@@ -56,7 +56,7 @@ Generate Motion Profiles to follow with a Talon SRX
  
 ![alt text][logo1]
 
-[logo1]: https://github.com/unbun/Motion_Profile_Generator/blob/master/images/ChooseDirectory.PNG
+[logo1]: https://github.com/unbun/Motion_Profile_Generator2018/blob/master/images/ChooseDirectory.PNG
 
 - Enter the file name in the File Name text box
 - Click the Browse button to choose the directory you want to save the profiles in
@@ -74,7 +74,7 @@ Generate Motion Profiles to follow with a Talon SRX
 
 ![alt text][logo2]
 
-[logo2]: https://github.com/unbun/Motion_Profile_Generator/blob/master/images/MenuBar.PNG
+[logo2]: https://github.com/unbun/Motion_Profile_Generator2018/blob/master/images/MenuBar.PNG
 
 - **File Menu**
 	- New Profile
@@ -93,7 +93,7 @@ Generate Motion Profiles to follow with a Talon SRX
 		
 ![alt text][logo3]
 
-[logo3]: https://github.com/unbun/Motion_Profile_Generator/blob/master/images/About.PNG
+[logo3]: https://github.com/unbun/Motion_Profile_Generator2018/blob/master/images/About.PNG
 
 ## Acknowledgments
 ---
