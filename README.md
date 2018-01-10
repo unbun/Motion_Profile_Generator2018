@@ -1,3 +1,6 @@
+TODO: Integrate PID tuning and create testable mode to experiment w/ kinematic constants
+TODO: Auto-Command generator (create a Command Class, or class outline instead of a csv)
+
 # Motion Profile Generator
 Generate Motion Profiles to follow with a Talon SRX
  
