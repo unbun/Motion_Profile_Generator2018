@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -45,6 +46,7 @@ import javax.swing.text.Utilities;
 
 public class Gui2 {
 
+	private boolean showFieldStructures = true;
 	private JFrame frmMotionProfileGenerator;
 
 	private JTextField txtTime;
@@ -75,7 +77,6 @@ public class Gui2 {
 	private File pFile;
 
 	// Path Waypoints
-	// private Waypoint[] points;
 	private List<Waypoint> points = new ArrayList<Waypoint>(); // can be variable length after creation
 
 	double timeStep;
@@ -99,7 +100,6 @@ public class Gui2 {
 	public Gui2() {
 		initialize();
 	}
-
 
 	/**
 	 * Initialize the contents of the frame.
@@ -166,13 +166,27 @@ public class Gui2 {
 		txtJerk.setColumns(10);
 
 		JButton btnGeneratePath = new JButton("Generate Path");
-		btnGeneratePath.setBounds(90, 566, 130, 24);
+		btnGeneratePath.setBounds(90, 550, 130, 24);
 		trajecPanel.add(btnGeneratePath);
 
 		btnGeneratePath.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				try {
 					btnGeneratePathActionPerformed(evt);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		JButton btnShowField = new JButton("Toggle Field Structures");
+		btnShowField.setBounds(140, 580, 180, 24);
+		trajecPanel.add(btnShowField);
+
+		btnShowField.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				try {
+					btnToggleFieldStructures(evt);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -210,7 +224,7 @@ public class Gui2 {
 		});
 
 		JButton btnSave = new JButton("Save");
-		btnSave.setBounds(230, 566, 130, 24);
+		btnSave.setBounds(230, 550, 130, 24);
 		trajecPanel.add(btnSave);
 
 		btnSave.addActionListener(new java.awt.event.ActionListener() {
@@ -394,10 +408,36 @@ public class Gui2 {
 			}
 		});
 
-		motionGraphAlliance();
+		tabbedPane.insertTab("Field View", null, allianceGraph, null, 0);
+		showBackground(27.0, 33.0);
 		velocityGraph();
 	};
 
+	protected void btnToggleFieldStructures(ActionEvent evt) throws IOException {
+		this.showFieldStructures = !showFieldStructures;
+		
+		// clear on both, works on toggle, clears path;
+		if (this.showFieldStructures) {
+			showBackground(27.0, 33.0);
+		
+		} else {
+			allianceGraph.clearGraph();
+			allianceGraph.repaint();
+		}
+		
+		if(points.size() > 1) {
+			try {
+				this.btnGeneratePathActionPerformed(evt);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}		
+		
+		return;
+
+	}
+	
+		
 	private void aboutPage() {
 		JFrame about = new JFrame();
 		about.setLocationByPlatform(true);
@@ -457,10 +497,11 @@ public class Gui2 {
 		lblJH.setBounds(109, 272, 250, 14);
 		panel.add(lblJH);
 	}
-
-	// Graphics to help visualizations
-	private void motionGraphAlliance() {
-		tabbedPane.insertTab("Field View", null, allianceGraph, null, 0);
+	
+	private void createGraph( double width, double height) {
+		
+		allianceGraph.repaint();
+		
 		// Create a blank grid for the field graph
 		allianceGraph.yGridOn();
 		allianceGraph.xGridOn();
@@ -469,12 +510,20 @@ public class Gui2 {
 		allianceGraph.setTitle(
 				"Top Down View of FRC Field - Blue Alliance (33 x 27ft) \n shows global position of robot path with left and right wheel trajectories");
 
+		
 		// force graph to show field dimensions of 30ft x 27 feet
-		double fieldWidth = 27.0; // height for top-down view
-		double fieldLength = 33.0; // length for top-down view
+		double fieldWidth = width; // height for top-down view
+		double fieldLength = height; // length for top-down view
 		allianceGraph.setXTic(0, fieldLength, 1);
 		allianceGraph.setYTic(0, fieldWidth, 1);
 
+	}
+
+	// Graphics to help visualizations
+	private void showBackground(double fieldWidth, double fieldLength ) {
+
+		createGraph(fieldWidth, fieldLength);
+		
 		allianceGraph.addData(FieldStructures.AllianceSwitch, Color.black);
 		allianceGraph.addData(FieldStructures.TopSwitchPlate, new Color(138, 43, 226));
 		allianceGraph.addData(FieldStructures.BotSwitchPlate, new Color(138, 43, 226));
@@ -484,7 +533,7 @@ public class Gui2 {
 		allianceGraph.addData(FieldStructures.BluePlatRamp, Color.blue);
 		allianceGraph.addData(FieldStructures.RedPlat, Color.red);
 		allianceGraph.addData(FieldStructures.RedPlatRamp, Color.red);
-		
+
 		allianceGraph.addData(FieldStructures.XChangeZone, Color.blue);
 		allianceGraph.addData(FieldStructures.CubeZone, Color.blue);
 		// Auto Line
@@ -497,12 +546,12 @@ public class Gui2 {
 
 		double[][] midTick2 = new double[][] { { 27.0, fieldWidth }, { 27.0, 21. } };
 		allianceGraph.addData(midTick2, Color.black);
-		
-		//Portal Walls
-		double[][] botPortal = new double[][] {{0,2.474} , {2.917,0}};
+
+		// Portal Walls
+		double[][] botPortal = new double[][] { { 0, 2.474 }, { 2.917, 0 } };
 		allianceGraph.addData(botPortal, Color.black);
 
-		double[][] topPortal = new double[][] {{0,fieldWidth-2.474} , {2.917,fieldWidth}};
+		double[][] topPortal = new double[][] { { 0, fieldWidth - 2.474 }, { 2.917, fieldWidth } };
 		allianceGraph.addData(topPortal, Color.black);
 
 	}
@@ -593,11 +642,15 @@ public class Gui2 {
 		// clear graphs
 		velocityGraph.clearGraph();
 		velocityGraph.repaint();
-		allianceGraph.clearGraph();
 		allianceGraph.repaint();
 
-		motionGraphAlliance();
+		tabbedPane.insertTab("Field View", null, allianceGraph, null, 0);
+		showBackground(27.0, 33.0);
 		velocityGraph();
+		
+		//Resize the graph to optimize the view of the path according to the view
+		boolean generated = false;
+		
 
 		if (timeStep > 0) {
 			if (velocity > 0) {
@@ -609,6 +662,7 @@ public class Gui2 {
 								Waypoint tmp[] = new Waypoint[points.size()];
 								points.toArray(tmp);
 								try {
+									createGraph();
 									trajectory(timeStep, velocity, acceleration, jerk, wheelBase, tmp);
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null,
@@ -640,9 +694,31 @@ public class Gui2 {
 			JOptionPane.showMessageDialog(null, "The Time Step value is invalid!", "Invalid Value",
 					JOptionPane.INFORMATION_MESSAGE);
 		}
+		
+		
 
 	}
-
+	
+	private void createGraph() {
+		double maxX = this.points.get(0).x, maxY = this.points.get(0).x;
+		for(int i = 0; i < this.points.size(); i++) {
+			
+			if(points.get(i).x > maxX) 
+				maxX = points.get(i).x;
+			
+			if(points.get(i).y > maxY)
+				maxY = points.get(i).y;
+				
+		}
+		
+		if(this.showFieldStructures) {
+			showBackground(27.0, 33.0);
+		}else {
+			
+			createGraph(maxX + wheelBase, maxY + wheelBase);
+			
+		}
+	}
 	private void mouseEvent(MouseEvent e) {
 		if (e.getButton() != MouseEvent.BUTTON1) {
 			return;
@@ -948,7 +1024,7 @@ public class Gui2 {
 		velocityGraph.clearGraph();
 		velocityGraph.repaint();
 
-		motionGraphAlliance();
+		showBackground(27.0, 33.0);
 		velocityGraph();
 
 		points.clear();
@@ -1057,34 +1133,25 @@ public class Gui2 {
 		public static double[][] BluePlat = new double[][] { { 23.562, 17.833 }, { 23.562, 9.166 }, { 27.0, 9.166 },
 				{ 27.0, 17.833 }, { 23.562, 17.833 } };
 
-		
 		public static double[][] RedPlat = new double[][] { { 30.438, 17.833 }, { 30.438, 9.166 }, { 27.0, 9.166 },
 				{ 27.0, 17.833 }, { 30.438, 17.833 } };
 
 		private static double rampWidth = 1.08333;
 		public static double[][] BluePlatRamp = new double[][] { { 25.0, 17.833 + rampWidth },
-						{ 23.562 - rampWidth, 17.833 + rampWidth }, { 23.562 - rampWidth, 9.166 - rampWidth },
-						{ 25.0, 9.166 - rampWidth }, };
+				{ 23.562 - rampWidth, 17.833 + rampWidth }, { 23.562 - rampWidth, 9.166 - rampWidth },
+				{ 25.0, 9.166 - rampWidth }, };
 
 		public static double[][] RedPlatRamp = new double[][] { { 29.0, 17.833 + rampWidth },
 				{ 30.438 + rampWidth, 17.833 + rampWidth }, { 30.438 + rampWidth, 9.166 - rampWidth },
 				{ 29.0, 9.166 - rampWidth }, };
-				
-		public static double[][] CubeZone = new double[][] {
-			{11.875,15.375},
-			{8.375,15.375},
-			{8.375,11.625},
-			{11.875,11.625}
-		};
-		
-		public static double[][] XChangeZone = new double[][] {
-			{0,12.5},
-			{3,12.5},
-			{3,8.5},
-			{0,8.5},
-			{0,12.5}
+
+		public static double[][] CubeZone = new double[][] { { 11.875, 15.375 }, { 8.375, 15.375 }, { 8.375, 11.625 },
+				{ 11.875, 11.625 } };
+
+		public static double[][] XChangeZone = new double[][] { { 0, 12.5 }, { 3, 12.5 }, { 3, 8.5 }, { 0, 8.5 },
+				{ 0, 12.5 }
 
 		};
-		
+
 	}
 }
